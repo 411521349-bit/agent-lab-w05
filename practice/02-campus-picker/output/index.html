@@ -131,6 +131,7 @@ const $ = id => document.getElementById(id);
 let language='en';
 let history=[];
 let lastPick=null;
+let noMatches=false;
 function t(key){return copy[language][key];}
 function makeChip(text){const span=document.createElement('span');span.className='chip';span.textContent=text;return span;}
 function renderActivity(activity,target){
@@ -158,6 +159,7 @@ function renderLanguage(){
   document.querySelectorAll('[data-lang]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.lang===language)));
   document.querySelector('.lang-switch').setAttribute('aria-label',t('language'));
   if(lastPick) renderActivity(lastPick,$('result'));
+  else if(noMatches) $('result').textContent=t('none');
   renderHistory();
 }
 function matches(activity){
@@ -166,9 +168,9 @@ function matches(activity){
 }
 $('pick').addEventListener('click',()=>{
   const candidates=activities.filter(matches), result=$('result');
-  if(candidates.length===0){lastPick=null;result.className='result empty';result.textContent=t('none');return;}
+  if(candidates.length===0){lastPick=null;noMatches=true;result.className='result empty';result.textContent=t('none');return;}
   const picked=candidates[Math.floor(Math.random()*candidates.length)];
-  lastPick=picked;result.className='result has-result';renderActivity(picked,result);
+  lastPick=picked;noMatches=false;result.className='result has-result';renderActivity(picked,result);
   history=[picked,...history].slice(0,5);renderHistory();
 });
 $('reset').addEventListener('click',()=>{$('location').value='all';$('time').value='30';$('energy').value='all';});
@@ -178,3 +180,4 @@ renderLanguage();
 </script>
 </body>
 </html>
+
